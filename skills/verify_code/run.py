@@ -56,7 +56,7 @@ def run_sql(dsn, sql):
             port=int(port),
             user=user,
             password=password,
-            database="", # Connect without DB first? Zero gives access to created DB usually.
+            database=db, # Use the parsed database name
             ssl={"check_hostname": False},
             connect_timeout=10,
             charset='utf8mb4'
