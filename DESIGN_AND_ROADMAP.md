@@ -48,6 +48,20 @@ These are the distributable units.
 
 ---
 
+## 🛡️ Testing Standard (Definition of Done)
+
+Every Skill **MUST** include a Live End-to-End (E2E) Test (`tests/integration/test_<skill_name>.py`) that proves the capability works in the real world.
+
+**E2E Test Checklist:**
+1.  **Real Infrastructure:** Must provision a real TiDB Zero instance (no mocks).
+2.  **Real Scenario:** Must execute the core user story (e.g., "Load CSV", "Vector Search").
+3.  **Self-Checking:** Must assert that the output JSON is valid and correct.
+
+*Example flow for `data-refinery`:*
+> Generate CSV -> Provision DB -> Run Skill -> Query DB to verify data is clean -> Pass.
+
+---
+
 ## 📅 Roadmap: Delivering the 15 Superpowers
 
 ### Phase 1: The Foundation (Current Status: ✅)

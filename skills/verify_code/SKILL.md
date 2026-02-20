@@ -8,9 +8,19 @@ description: "Safely execute and validate SQL code in a disposable TiDB Zero san
 ## Goal
 To prevent "hallucinated SQL". This skill provisions a temporary database, runs your SQL, and returns the result or error.
 
-## When to use
-*   **Always** after generating a complex SQL query.
-*   **Always** when the user asks "Test this SQL for me".
+## 📥 Installation
+
+### 1. Add to `TOOLS.md`
+Add the following block to your agent's tool definitions:
+
+```markdown
+- **verify-code**: Verify SQL correctness using TiDB Zero.
+  - **Location:** `/path/to/skills/verify_code/SKILL.md`
+  - **Command:** `python /path/to/skills/verify_code/run.py --sql "<QUERY>"`
+```
+
+### 2. Add to `AGENTS.md` (Mandatory Protocol)
+Copy the content of [PROTOCOL.md](PROTOCOL.md) into your agent's system prompt or operational protocols section. This ensures the agent *automatically* uses this skill.
 
 ## Usage (Standalone)
 
