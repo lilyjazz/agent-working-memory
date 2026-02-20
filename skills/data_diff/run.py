@@ -3,17 +3,27 @@ import json
 import subprocess
 import sys
 import os
-import pandas as pd
-try: import pymysql
-except: pass
+try:
+    import pymysql
+    import pandas as pd
+except ImportError:
+    print(json.dumps({"success": False, "error": "Missing dependency: pymysql or pandas"}))
+    sys.exit(1)
 
 # --- Provisioner (Standard) ---
 def create_temp_db():
-    try:
-        cmd = ["curl", "-sS", "-X", "POST", "https://zero.tidbapi.com/v1alpha1/instances", "-H", "content-type: application/json", "-d", "{}"]
-        res = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-        return json.loads(res.stdout).get("instance", {}).get("connectionString")
-    except: return None
+    # Simple retry logic for provisioning
+    for i in range(3):
+        try:
+            cmd = ["curl", "-sS", "-X", "POST", "https://zero.tidbapi.com/v1alpha1/instances", "-H", "content-type: application/json", "-d", "{}"]
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            if res.returncode == 0:
+                data = json.loads(res.stdout)
+                dsn = data.get("instance", {}).get("connectionString")
+                if dsn: return dsn
+        except:
+            time.sleep(2)
+    return None
 
 def parse_dsn(dsn):
     prefix = "mysql://"
@@ -45,8 +55,13 @@ def run_diff(file_a, file_b):
     if not dsn: return {"success": False, "error": "Provision failed"}
     
     try:
+        print(f"DEBUG: Reading {file_a}...")
         df_a = pd.read_csv(file_a) if file_a.endswith('.csv') else pd.read_excel(file_a)
+        print(f"DEBUG: df_a type: {type(df_a)}")
+        
+        print(f"DEBUG: Reading {file_b}...")
         df_b = pd.read_csv(file_b) if file_b.endswith('.csv') else pd.read_excel(file_b)
+        print(f"DEBUG: df_b type: {type(df_b)}")
         
         # Ensure schemas match for simple diff
         common_cols = list(set(df_a.columns) & set(df_b.columns))

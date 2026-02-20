@@ -1,1 +1,1 @@
-print({"success": True, "msg": "Team Board Ready"})
+import json; print(json.dumps({"success": True, "msg": "Team Board Ready"}))

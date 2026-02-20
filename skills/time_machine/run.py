@@ -1,1 +1,1 @@
-print({"success": True, "msg": "Time Machine Ready"})
+import json; print(json.dumps({"success": True, "msg": "Time Machine Ready"}))
