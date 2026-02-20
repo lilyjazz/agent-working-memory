@@ -5,28 +5,36 @@ Each skill folder (e.g., `skills/verify-code/`) is a complete micro-app with its
 
 ---
 
-## 🏗 System Architecture (Standalone Model)
+## 🏗 System Architecture: The "Body-Mind-Heart" Model
 
-```text
-tidb-zero-project/
-├── skills/
-│   ├── verify-code/      # [Standalone Unit]
-│   │   ├── SKILL.md      # User Manual
-│   │   ├── run.py        # Logic (Provisions + Executes)
-│   │   └── requirements.txt
-│   │
-│   ├── data-refinery/    # [Standalone Unit]
-│   │   ├── SKILL.md
-│   │   ├── run.py
-│   │   └── requirements.txt
-│   │
-│   └── ...
+To make a Skill truly useful to an autonomous Agent, it needs three parts:
+
+| Component | Metaphor | File | Purpose |
+| :--- | :--- | :--- | :--- |
+| **Code** | **Hands (手)** | `run.py` | **Execution.** The Python logic that calls APIs (TiDB Zero) and runs SQL. It must be robust, self-contained, and output strict JSON. |
+| **Definition** | **Brain (脑)** | `SKILL.md` | **Knowledge.** Defines *what* the tool is and *how* to call it. This goes into the Agent's `TOOLS.md`. |
+| **Protocol** | **Heart (心)** | `PROTOCOL.md` | **Instinct.** Defines *when* and *why* to use it. This goes into the Agent's `AGENTS.md` (System Prompt) to trigger autonomous behavior (e.g., "Always verify SQL"). |
+
+```mermaid
+[Agent]
+   |
+   +-- (Heart) Instinct: "I must verify this SQL." (Reads AGENTS.md)
+   |
+   +-- (Brain) Knowledge: "I have a tool for that." (Reads TOOLS.md)
+   |
+   +-- (Hands) Action: Calls `python run.py`
+         |
+         +-- Provisions TiDB Zero -> Runs SQL -> Returns JSON
 ```
 
-This architecture allows:
-1.  **Independent Distribution:** Users can grab just one folder.
-2.  **Zero Coupling:** Changes in `verify-code` don't break `data-refinery`.
-3.  **Simple Integration:** Agent just needs to run `python skills/<name>/run.py`.
+---
+
+## 🛡️ Testing Standard (Definition of Done)
+
+Every Skill **MUST** include:
+1.  **Unit Tests:** `tests/unit/` (Mocked network).
+2.  **Live Tests:** `tests/integration/` (Real TiDB connection).
+3.  **Agent Simulation:** `tests/e2e_agent_simulation.md` (A script to verify the Agent *autonomously* uses the skill).
 
 ---
 

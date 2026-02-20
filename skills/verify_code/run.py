@@ -51,6 +51,11 @@ def run_sql(dsn, sql):
         host_port, db = rest.split("/")
         host, port = host_port.split(":")
         
+        # Default to 'test' if no db specified, as TiDB Zero allows creating tables there?
+        # Actually TiDB Cloud Serverless usually has a 'test' DB pre-created.
+        if not db:
+            db = "test"
+
         conn = pymysql.connect(
             host=host,
             port=int(port),
