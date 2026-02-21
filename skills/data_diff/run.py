@@ -55,13 +55,8 @@ def run_diff(file_a, file_b):
     if not dsn: return {"success": False, "error": "Provision failed"}
     
     try:
-        print(f"DEBUG: Reading {file_a}...")
         df_a = pd.read_csv(file_a) if file_a.endswith('.csv') else pd.read_excel(file_a)
-        print(f"DEBUG: df_a type: {type(df_a)}")
-        
-        print(f"DEBUG: Reading {file_b}...")
         df_b = pd.read_csv(file_b) if file_b.endswith('.csv') else pd.read_excel(file_b)
-        print(f"DEBUG: df_b type: {type(df_b)}")
         
         # Ensure schemas match for simple diff
         common_cols = list(set(df_a.columns) & set(df_b.columns))
@@ -81,11 +76,13 @@ def run_diff(file_a, file_b):
             col_list = ", ".join([f"`{c}`" for c in common_cols])
             join_cond = " AND ".join([f"a.`{c}` <=> b.`{c}`" for c in common_cols])
             
-            # Removed Rows (In A but not B)
-            sql_removed = f"SELECT {col_list} FROM table_a a LEFT JOIN table_b b ON {join_cond} WHERE b.`{common_cols[0]}` IS NULL"
+            # Removed Rows (In A but not B) - Select from A
+            col_list_a = ", ".join([f"a.`{c}`" for c in common_cols])
+            sql_removed = f"SELECT {col_list_a} FROM table_a a LEFT JOIN table_b b ON {join_cond} WHERE b.`{common_cols[0]}` IS NULL"
             
-            # Added Rows (In B but not A)
-            sql_added = f"SELECT {col_list} FROM table_b b LEFT JOIN table_a a ON {join_cond} WHERE a.`{common_cols[0]}` IS NULL"
+            # Added Rows (In B but not A) - Select from B
+            col_list_b = ", ".join([f"b.`{c}`" for c in common_cols])
+            sql_added = f"SELECT {col_list_b} FROM table_b b LEFT JOIN table_a a ON {join_cond} WHERE a.`{common_cols[0]}` IS NULL"
             
             removed = []
             with conn.cursor() as cur:
