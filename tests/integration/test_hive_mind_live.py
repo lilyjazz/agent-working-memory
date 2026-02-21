@@ -36,6 +36,7 @@ class TestHiveMindLive(unittest.TestCase):
         # 4. List
         print("Test: List Preferences")
         res = hive.manage_prefs(self.dsn, "list")
+        self.assertTrue(res['success'], f"List failed: {res.get('error')}")
         self.assertIn("theme", res['prefs'])
 
 if __name__ == '__main__':

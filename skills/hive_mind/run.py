@@ -57,15 +57,16 @@ def manage_prefs(dsn, action, key=None, value=None):
                     return {"success": True, "action": "set", "key": key}
                 
                 elif action == "get":
-                    if key:
-                        cursor.execute("SELECT pref_value FROM user_prefs WHERE pref_key=%s", (key,))
-                        row = cursor.fetchone()
-                        val = row[0] if row else None
-                        return {"success": True, "action": "get", "key": key, "value": val}
-                    else:
-                        cursor.execute("SELECT pref_key, pref_value FROM user_prefs")
-                        rows = cursor.fetchall()
-                        return {"success": True, "action": "list", "prefs": dict(rows)}
+                    if not key: return {"success": False, "error": "Key required for get"}
+                    cursor.execute("SELECT pref_value FROM user_prefs WHERE pref_key=%s", (key,))
+                    row = cursor.fetchone()
+                    val = row[0] if row else None
+                    return {"success": True, "action": "get", "key": key, "value": val}
+                
+                elif action == "list":
+                    cursor.execute("SELECT pref_key, pref_value FROM user_prefs")
+                    rows = cursor.fetchall()
+                    return {"success": True, "action": "list", "prefs": dict(rows)}
                         
     except Exception as e:
         return {"success": False, "error": str(e)}
